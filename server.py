@@ -69,3 +69,9 @@ elif self.path == "/Getgachadesc":
         "endpoint": "/Getgachadesc",
         "message": "Gacha description request received"
     })
+elif self.path == "/tcp":
+    self.send_json({
+        "success": True,
+        "endpoint": "/tcp",
+        "message": "TCP test endpoint received"
+    })

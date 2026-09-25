@@ -18,12 +18,29 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_GET(self):
+
         if self.path == "/":
             self.send_json({
                 "success": True,
                 "server": "game-server",
                 "status": "online"
             })
+
+        elif self.path == "/status":
+            self.send_json({
+                "success": True,
+                "server": "game-server",
+                "status": "online",
+                "endpoints": [
+                    "/majorlogin",
+                    "/Getbackpack",
+                    "/Getlogindata",
+                    "/logingetdesc",
+                    "/Getgachadesc",
+                    "/tcp"
+                ]
+            })
+
         else:
             self.send_json({
                 "success": False,
@@ -31,6 +48,7 @@ class Handler(BaseHTTPRequestHandler):
             })
 
     def do_POST(self):
+
         length = int(self.headers.get("Content-Length", 0))
         body = self.rfile.read(length)
 

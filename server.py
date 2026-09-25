@@ -1,8 +1,10 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
+import os
 
 HOST = "0.0.0.0"
-PORT = 9000
+PORT = int(os.environ.get("PORT", 9000))
+
 
 class Handler(BaseHTTPRequestHandler):
 
@@ -19,59 +21,73 @@ class Handler(BaseHTTPRequestHandler):
         if self.path == "/":
             self.send_json({
                 "success": True,
-                "message": "My game server is online"
+                "server": "game-server",
+                "status": "online"
             })
         else:
             self.send_json({
                 "success": False,
                 "message": "Endpoint not found"
             })
-def do_POST(self):
-    length = int(self.headers.get("Content-Length", 0))
-    body = self.rfile.read(length)
 
-    print("POST:", self.path)
-    print("Bytes:", len(body))
+    def do_POST(self):
+        length = int(self.headers.get("Content-Length", 0))
+        body = self.rfile.read(length)
 
-    if self.path == "/majorlogin":
-        self.send_json({
-            "success": True,
-            "endpoint": "majorlogin",
-            "message": "Login request received"
-        })
+        print("POST:", self.path)
+        print("Bytes:", len(body))
 
-    else:
-        self.send_json({
-            "success": False,
-            "message": "Endpoint not found"
-        })
-elif self.path == "/Getbackpack":
-    self.send_json({
-        "success": True,
-        "endpoint": "/Getbackpack",
-        "message": "Backpack request received"
-    })
-elif self.path == "/Getlogindata":
-    self.send_json({
-        "success": True,
-        "endpoint": "/Getlogindata",
-        "message": "Login data request received"
-    })
-elif self.path == "/logingetdesc":
-    self.send_json({
-        "success": True,
-        "endpoint": "/logingetdesc",
-        "message": "Login description request received"
-    })
-elif self.path == "/Getgachadesc":
-    self.send_json({
-        "success": True,
-        "endpoint": "/Getgachadesc",
-        "message": "Gacha description request received"
-    })
-elif self.path == "/tcp":
-    self.send_json({
-        "success": True,
-        "endpoint": "/tcp",
-        "message": "TCP test endpoint received"
-    })
+        if self.path == "/majorlogin":
+            self.send_json({
+                "success": True,
+                "endpoint": "/majorlogin",
+                "message": "Login request received"
+            })
+
+        elif self.path == "/Getbackpack":
+            self.send_json({
+                "success": True,
+                "endpoint": "/Getbackpack",
+                "message": "Backpack request received"
+            })
+
+        elif self.path == "/Getlogindata":
+            self.send_json({
+                "success": True,
+                "endpoint": "/Getlogindata",
+                "message": "Login data request received"
+            })
+
+        elif self.path == "/logingetdesc":
+            self.send_json({
+                "success": True,
+                "endpoint": "/logingetdesc",
+                "message": "Login description request received"
+            })
+
+        elif self.path == "/Getgachadesc":
+            self.send_json({
+                "success": True,
+                "endpoint": "/Getgachadesc",
+                "message": "Gacha description request received"
+            })
+
+        elif self.path == "/tcp":
+            self.send_json({
+                "success": True,
+                "endpoint": "/tcp",
+                "message": "TCP test endpoint received"
+            })
+
+        else:
+            self.send_json({
+                "success": False,
+                "message": "Endpoint not found"
+            })
+
+
+server = HTTPServer((HOST, PORT), Handler)
+
+print(f"Game server running on port {PORT}")
+
+server.serve_forever()

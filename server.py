@@ -51,3 +51,9 @@ elif self.path == "/Getbackpack":
         "endpoint": "/Getbackpack",
         "message": "Backpack request received"
     })
+elif self.path == "/Getlogindata":
+    self.send_json({
+        "success": True,
+        "endpoint": "/Getlogindata",
+        "message": "Login data request received"
+    })

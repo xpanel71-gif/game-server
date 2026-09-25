@@ -45,3 +45,9 @@ def do_POST(self):
             "success": False,
             "message": "Endpoint not found"
         })
+elif self.path == "/Getbackpack":
+    self.send_json({
+        "success": True,
+        "endpoint": "/Getbackpack",
+        "message": "Backpack request received"
+    })

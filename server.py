@@ -8,10 +8,10 @@ PORT = int(os.environ.get("PORT", 9000))
 
 class Handler(BaseHTTPRequestHandler):
 
-    def send_json(self, data):
+    def send_json(self, data, status=200):
         body = json.dumps(data).encode()
 
-        self.send_response(200)
+        self.send_response(status)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
@@ -44,64 +44,78 @@ class Handler(BaseHTTPRequestHandler):
         else:
             self.send_json({
                 "success": False,
+                "error": "not_found",
                 "message": "Endpoint not found"
-            })
+            }, 404)
 
     def do_POST(self):
 
-        length = int(self.headers.get("Content-Length", 0))
-        body = self.rfile.read(length)
+        try:
+            length = int(self.headers.get("Content-Length", 0))
 
-        print("POST:", self.path)
-        print("Bytes:", len(body))
+            if length > 1024 * 1024:
+                self.send_json({
+                    "success": False,
+                    "error": "payload_too_large"
+                }, 413)
+                return
 
-        if self.path == "/majorlogin":
-            self.send_json({
-                "success": True,
-                "endpoint": "/majorlogin",
-                "message": "Login request received"
-            })
+            body = self.rfile.read(length)
 
-        elif self.path == "/Getbackpack":
-            self.send_json({
-                "success": True,
-                "endpoint": "/Getbackpack",
-                "message": "Backpack request received"
-            })
+            print("POST:", self.path)
+            print("Bytes:", len(body))
 
-        elif self.path == "/Getlogindata":
-            self.send_json({
-                "success": True,
-                "endpoint": "/Getlogindata",
-                "message": "Login data request received"
-            })
+            responses = {
+                "/majorlogin": "Login request received",
+                "/Getbackpack": "Backpack request received",
+                "/Getlogindata": "Login data request received",
+                "/logingetdesc": "Login description request received",
+                "/Getgachadesc": "Gacha description request received",
+                "/tcp": "TCP test endpoint received"
+            }
 
-        elif self.path == "/logingetdesc":
-            self.send_json({
-                "success": True,
-                "endpoint": "/logingetdesc",
-                "message": "Login description request received"
-            })
+            if self.path in responses:
+                self.send_json({
+                    "success": True,
+                    "endpoint": self.path,
+                    "message": responses[self.path]
+                })
+            else:
+                self.send_json({
+                    "success": False,
+                    "error": "not_found",
+                    "message": "Endpoint not found"
+                }, 404)
 
-        elif self.path == "/Getgachadesc":
-            self.send_json({
-                "success": True,
-                "endpoint": "/Getgachadesc",
-                "message": "Gacha description request received"
-            })
+        except Exception as e:
+            print("Request error:", e)
 
-        elif self.path == "/tcp":
-            self.send_json({
-                "success": True,
-                "endpoint": "/tcp",
-                "message": "TCP test endpoint received"
-            })
-
-        else:
             self.send_json({
                 "success": False,
-                "message": "Endpoint not found"
-            })
+                "error": "server_error",
+                "message": "Request could not be processed"
+            }, 500)
+
+    def do_PUT(self):
+        self.send_json({
+            "success": False,
+            "error": "method_not_allowed",
+            "message": "PUT is not supported"
+        }, 405)
+
+    def do_DELETE(self):
+        self.send_json({
+            "success": False,
+            "error": "method_not_allowed",
+            "message": "DELETE is not supported"
+        }, 405)
+
+    def do_PATCH(self):
+        self.send_json({
+            "success": False,
+            "error": "method_not_allowed",
+            "message": "PATCH is not supported"
+        }, 405)
 
 
 server = HTTPServer((HOST, PORT), Handler)

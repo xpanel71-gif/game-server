@@ -63,3 +63,9 @@ elif self.path == "/logingetdesc":
         "endpoint": "/logingetdesc",
         "message": "Login description request received"
     })
+elif self.path == "/Getgachadesc":
+    self.send_json({
+        "success": True,
+        "endpoint": "/Getgachadesc",
+        "message": "Gacha description request received"
+    })

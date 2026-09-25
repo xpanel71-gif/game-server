@@ -26,22 +26,22 @@ class Handler(BaseHTTPRequestHandler):
                 "success": False,
                 "message": "Endpoint not found"
             })
+def do_POST(self):
+    length = int(self.headers.get("Content-Length", 0))
+    body = self.rfile.read(length)
 
-    def do_POST(self):
-        length = int(self.headers.get("Content-Length", 0))
-        body = self.rfile.read(length)
+    print("POST:", self.path)
+    print("Bytes:", len(body))
 
-        print("POST:", self.path)
-        print("Bytes:", len(body))
-
+    if self.path == "/majorlogin":
         self.send_json({
             "success": True,
-            "endpoint": self.path,
-            "message": "Request received"
+            "endpoint": "majorlogin",
+            "message": "Login request received"
         })
 
-server = HTTPServer((HOST, PORT), Handler)
-
-print(f"Server running on http://127.0.0.1:{PORT}")
-
-server.serve_forever()
+    else:
+        self.send_json({
+            "success": False,
+            "message": "Endpoint not found"
+        })
